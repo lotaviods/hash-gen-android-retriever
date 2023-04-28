@@ -7,27 +7,17 @@ while true; do
         read -p "Key-alias store password:"$'\n' keypass
         
         read -p "Bundle id:"$'\n' bundleid
-        
-        read -p "Generate new jks key? [Y/N]"$'\n' yn
-        
-        case $yn in
-        
-        [Yy]* )
-        read -p "New jks key file name:"$'\n' jkspath
-        read -p "Deployment_cert file name:"$'\n' devfilename
+  
+        read -p "Dev Certificate file path:"$'\n' devCertPath
 
-        keytool -importcert -alias $keyalias -file $devfilename -keystore $jkspath -storepass $keypass;;
-        
-        [Nn]* ) 
-        read -p "Existent jks file name:"$'\n' jkspath ;;
-        * );;
-
-        esac
-    
+        keytool -importcert -alias $keyalias -file $devCertPath -keystore certificate.jks -storepass $keypass
+       
         echo "Generated hash: \n"
 	
-	keytool -exportcert -alias $keyalias -keystore $jkspath --storepass $keypass | xxd -p | tr -d "[:space:]" | xargs echo -n $bundleid | shasum -a 256 | tr -d "[:space:]-" | xxd -r -p | base64 | cut -c1-11
-
+	    keytool -exportcert -alias $keyalias -keystore certificate.jks --storepass $keypass | xxd -p | tr -d "[:space:]" | xargs echo -n $bundleid | shasum -a 256 | tr -d "[:space:]-" | xxd -r -p | base64 | cut -c1-11
+        
+        rm "certificate.jks"
+        
         echo
         ;;
         [Nn]* ) exit;;
